@@ -1,1 +1,1 @@
-# Blog Platform that deploys Ghost to AWS using RDS and EC2
+# Blog Platform with Ghost deployed to AWS using RDS and EC2
