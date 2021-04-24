@@ -12,6 +12,9 @@ contract Greeter {
     greeting = _greeting;
   }
 
+  // keywords:
+  // public --> makes function readable from outside of contract - React client
+  // view   --> read only from blockchain; no write
   function greet() public view returns (string memory) {
     return greeting;
   }
