@@ -7,10 +7,34 @@ import "./styles/App.css";
 const greeterAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 const App = () => {
+  const [greeting, setGreeting] = useState("");
+  const [data, setData] = useState("");
+
+  const fetchGreeting = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      // Web Provider
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // Greeter Contract instance
+      const contract = new ethers.Contract(
+        greeterAddress,
+        Greeter.abi,
+        provider
+      );
+
+      try {
+        const d = await contract.greet();
+        setData(d);
+        console.log("data: ", d);
+      } catch (err) {
+        console.log("error: ", err);
+      }
+    }
+  };
+
   return (
     <div className="App">
       <h2>React + Ethereum: Decentralized Application</h2>
-      <form onSubmit={handleOnSubmit}></form>
+      <form></form>
     </div>
   );
 };
