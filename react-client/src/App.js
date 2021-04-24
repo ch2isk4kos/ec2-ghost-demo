@@ -31,6 +31,10 @@ const App = () => {
     }
   };
 
+  const handleOnAccountRequest = async () => {
+    await window.ethereum.request({ method: "eth_requestAccounts" }); // prompts user to connect MetaMask account
+  };
+
   return (
     <div className="App">
       <h2>React + Ethereum: Decentralized Application</h2>
