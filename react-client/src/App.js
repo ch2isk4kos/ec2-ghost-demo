@@ -35,6 +35,29 @@ const App = () => {
     await window.ethereum.request({ method: "eth_requestAccounts" }); // prompts user to connect MetaMask account
   };
 
+  const handleOnGreetingSignature = async () => {
+    if (!greeting) return;
+
+    if (typeof window.ethereum !== "undefined") {
+      await handleOnAccountRequest();
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(greeterAddress, Greeter.abi, signer);
+      const transaction = await contract.setGreeting(greeting); // set user input
+
+      await transaction.wait(); // waiting for blockchain confirmation
+
+      fetchGreeting();
+    }
+  };
+
+  const handleOnSubmit = () => {
+    //
+    //
+    //
+  };
+
   return (
     <div className="App">
       <h2>React + Ethereum: Decentralized Application</h2>
