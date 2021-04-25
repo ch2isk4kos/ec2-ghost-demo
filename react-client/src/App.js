@@ -1,29 +1,26 @@
 import React, { useState, useEffect } from "react";
 import Greeter from "./artifacts/contracts/Greeter.sol/Greeter.json";
+import Token from "./artifacts/contracts/Token.sol/Token.json";
 import { ethers } from "ethers";
 import "./styles/App.css";
 
 // store contract address in a varibale where Greeter deployed to:
 const greeterAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const tokenAddress = "0x0c2E4a06b76B262273E7f9290586C9cc894F75D7";
 
 const App = () => {
+  // greeting
   const [greeting, setGreeting] = useState("");
-  // const [account, setAccount] = useState("");
   const [content, setContent] = useState("");
+
+  // token
+  const [userAccount, setUserAccount] = useState("");
+  const [userBalance, setUserBalance] = useState("");
+  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     fetchGreeting();
-    // fetchGreetings();
   }, []);
-
-  // const fetchGreetings = async () => {
-  //   if (typeof window.ethereum !== "undefined") {
-  //     const provider = new ethers.providers.JsonRpcProvider();
-  //     await provider.getBlockNumber().then((res) => {
-  //       console.log("response:", res.data);
-  //     });
-  //   }
-  // };
 
   const fetchGreeting = async () => {
     if (typeof window.ethereum !== "undefined") {
@@ -48,6 +45,32 @@ const App = () => {
 
   const requestAccount = async () => {
     await window.ethereum.request({ method: "eth_requestAccounts" }); // prompts user to connect MetaMask account
+  };
+
+  const getUserBalance = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      // returns an array of account
+      const [account] = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const provider = new ethers.providers.Web3Provider(window.ethereum); // create provider
+      const contract = new ethers.Contract(tokenAddress, Token.abi, provider); // create new instance of a token contract
+      const balance = await contract.balanceOf(account); // get the balance of the account instance
+      setUserBalance(balance.toString());
+      console.log("Account Balance: ", balance.toString()); // print balance to console
+    }
+  };
+
+  const transferCoins = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      await requestAccount();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(tokenAddress, Token.abi, signer);
+      const transation = await contract.transfer(userAccount, amount);
+      await transation.wait();
+      console.log(`${amount} Coins successfully sent to ${userAccount}`);
+    }
   };
 
   // const handleOnGreetingInput = (e) => {
@@ -92,6 +115,22 @@ const App = () => {
         />
         <button onClick={handleOnGreetingUpdate}>SIGN</button>
         {/* </form> */}
+        <br />
+        <input
+          onChange={(e) => setUserAccount(e.target.value)}
+          placeholder="Acount ID"
+        />
+        <input
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="Amount: $0.00"
+        />
+        <button onClick={getUserBalance}>GET BALANCE</button>
+        <button onClick={transferCoins}>TRANSFER COINS</button>
+        {!userBalance ? (
+          <h3>User Balance:</h3>
+        ) : (
+          <h3>User Balance: {userBalance}</h3>
+        )}
       </header>
     </div>
   );
